@@ -11,7 +11,8 @@ import android.view.View;
 public class MainActivity extends AppCompatActivity {
 
     int rx, ry = 0;
-
+    int dx =10, dy = 10;
+    final int rwidth = 100; final int rhieght = 100;
     public class DrawingView extends View{
         public DrawingView(Context c){
             super(c);
@@ -22,8 +23,18 @@ public class MainActivity extends AppCompatActivity {
         {
             Paint p = new Paint();
             p.setColor(Color.RED);
-            c.drawRect(rx, ry, 100, 100, p);
-            rx++; ry++;
+            c.drawRect(rx, ry, rx + rwidth, ry + rhieght, p);
+            rx += dx; ry += dy;
+
+            if(rx + rwidth > c.getWidth())
+                dx = -dx;
+            if(ry + rhieght > c.getHeight())
+                dy = -dy;
+            if(rx <0)
+                dx = -dx;
+            if(ry <0)
+                dy = -dy;
+            
             invalidate();
         }
     }

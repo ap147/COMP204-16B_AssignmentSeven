@@ -27,7 +27,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     DrawingView dv;
 
     //Circle Cords
-    int Circle_x, Circle_y = 0;
+    int Circle_x = 50; int Circle_y = 50;
     //Circle Size
     int Circle_radius = 50;
 
@@ -118,7 +118,22 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         protected void onDraw(Canvas c)
         {
             if(primary != null)
-            DrawCircleAndText(c,primary.x,primary.y);
+            {
+
+                speed_x -= sensor_x;
+                speed_y += sensor_y;
+
+                Circle_x += speed_x;
+                Circle_y += speed_y;
+
+
+                if (Circle_x < 0) { Circle_x = 0 + Circle_radius; sensor_x = 0; }
+                if (Circle_x + Circle_radius  > c.getWidth()) { Circle_x = c.getWidth() - Circle_radius; speed_x = 0; }
+                if (Circle_y < 0) { Circle_y = 0 + Circle_radius; sensor_y = 0; }
+                if (Circle_y + Circle_radius > c.getHeight()) { Circle_y = c.getHeight() - Circle_radius; sensor_y = 0; }
+
+                DrawCircleAndText(c, Circle_x, Circle_y);
+           }
             invalidate();
         }
 
@@ -128,7 +143,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     {
         Paint p = new Paint();
         p.setColor(Color.GREEN);
-        p.setStrokeWidth(10);
+
         c.drawCircle(x,y,Circle_radius, p);
 
 

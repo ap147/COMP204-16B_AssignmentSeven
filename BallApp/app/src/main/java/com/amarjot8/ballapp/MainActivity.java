@@ -158,9 +158,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             Circle_x += speed_x;
             Circle_y += sensor_y;
 
-            if (Circle_x < 0) { Circle_x = 0; speed_x = 0; }
+            if (Circle_x - Circle_radius < 0) { Circle_x = 0 + Circle_radius; speed_x = 0; }
             if (Circle_x + Circle_radius > c.getWidth()) { Circle_x = c.getWidth() - Circle_radius; speed_x = 0; }
-            if (Circle_y < 0) { Circle_y = 0; sensor_y = 0; }
+            if (Circle_y  - Circle_radius< 0) { Circle_y = 0 + Circle_radius; sensor_y = 0; }
             if (Circle_y + Circle_radius > c.getHeight()) { Circle_y = c.getHeight() - Circle_radius; speed_y = 0; }
             invalidate();
         }

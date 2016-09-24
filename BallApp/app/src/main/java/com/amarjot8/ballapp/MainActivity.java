@@ -113,14 +113,20 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 case MotionEvent.ACTION_MOVE:
                     if(FingerDownOnBall)
                     {
+                     //   primary = null;
                         pointers.get(0).x = (int) event.getX();
                         pointers.get(0).y = (int) event.getY();
                     }
                     break;
                 //User lifts finger
                 case MotionEvent.ACTION_UP:
-                  //  pointers.clear();
-                  //  primary = null;
+                    pointers.clear();
+                    if(FingerDownOnBall)
+                    {
+                        Circle_x = (int) event.getX();
+                        Circle_y = (int) event.getY();
+                    }
+                    FingerDownOnBall = false;
                     break;
                 case MotionEvent.ACTION_POINTER_UP:
                     break;
@@ -134,18 +140,28 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         @Override
         protected void onDraw(Canvas c)
         {
+             Paint p = new Paint();
+             DrawCircleAndText(c, Circle_x, Circle_y, Circle_radius);
 
-           // if(primary != null)
-          //  {
-                Paint p = new Paint();
-                DrawCircleAndText(c, Circle_x, Circle_y, Circle_radius);
 
-                for(PointerPoint pp : pointers)
-                {
-                    DrawCircleAndText(c, pp.x, pp.y,Circle_radius);
-                    c.drawLine(Circle_x, Circle_y, pp.x, pp.y, p);
-                }
-          //  }
+             for(PointerPoint pp : pointers)
+             {
+                 DrawCircleAndText(c, pp.x, pp.y,Circle_radius);
+                 c.drawLine(Circle_x, Circle_y, pp.x, pp.y, p);
+             }
+            speed_x -= sensor_x;
+            sensor_y += sensor_y;
+
+            speed_x *= 0.9f;
+            sensor_y *= 0.9f;
+
+            Circle_x += speed_x;
+            Circle_y += sensor_y;
+
+            if (Circle_x < 0) { Circle_x = 0; speed_x = 0; }
+            if (Circle_x + Circle_radius > c.getWidth()) { Circle_x = c.getWidth() - Circle_radius; speed_x = 0; }
+            if (Circle_y < 0) { Circle_y = 0; sensor_y = 0; }
+            if (Circle_y + Circle_radius > c.getHeight()) { Circle_y = c.getHeight() - Circle_radius; speed_y = 0; }
             invalidate();
         }
 

@@ -90,8 +90,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         //Circle Size
         int Circle_radius = 50;
 
-        public PointerPoint primary = null;
-        List<PointerPoint> pointers = new ArrayList<>();
+      //  public PointerPoint primary = null;
+       // List<PointerPoint> pointers = new ArrayList<>();
 
         public DrawingView(Context c)
         {
@@ -107,25 +107,24 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 //User Puts finger down
                 case MotionEvent.ACTION_DOWN:
                     if(IsFingerOnBall((int) event.getX(),(int) event.getY()))
-                    pointers.add(new PointerPoint((int) event.getX(), (int) event.getY(), 0));
+                    {
+                        Circle_x = (int) event.getX();
+                        Circle_y = (int) event.getY();
+                    }
+                   //
+                        // pointers.add(new PointerPoint((int) event.getX(), (int) event.getY(), 0));
                     break;
                 //Moving finger across screen
                 case MotionEvent.ACTION_MOVE:
                     if(FingerDownOnBall)
                     {
                      //   primary = null;
-                        pointers.get(0).x = (int) event.getX();
-                        pointers.get(0).y = (int) event.getY();
+                        Circle_x = (int) event.getX();
+                        Circle_y = (int) event.getY();
                     }
                     break;
                 //User lifts finger
                 case MotionEvent.ACTION_UP:
-                    pointers.clear();
-                    if(FingerDownOnBall)
-                    {
-                        Circle_x = (int) event.getX();
-                        Circle_y = (int) event.getY();
-                    }
                     FingerDownOnBall = false;
                     break;
                 case MotionEvent.ACTION_POINTER_UP:
@@ -140,28 +139,24 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         @Override
         protected void onDraw(Canvas c)
         {
-             Paint p = new Paint();
              DrawCircleAndText(c, Circle_x, Circle_y, Circle_radius);
+            if(!FingerDownOnBall)
+            {
+             speed_x -= sensor_x;
+             sensor_y += sensor_y;
 
+             speed_x *= 0.9f;
+             sensor_y *= 0.9f;
 
-             for(PointerPoint pp : pointers)
-             {
-                 DrawCircleAndText(c, pp.x, pp.y,Circle_radius);
-                 c.drawLine(Circle_x, Circle_y, pp.x, pp.y, p);
-             }
-            speed_x -= sensor_x;
-            sensor_y += sensor_y;
+              Circle_x += speed_x;
+             Circle_y += sensor_y;
 
-            speed_x *= 0.9f;
-            sensor_y *= 0.9f;
+               if (Circle_x - Circle_radius < 0) { Circle_x = 0 + Circle_radius; speed_x = 0; }
+               if (Circle_x + Circle_radius > c.getWidth()) { Circle_x = c.getWidth() - Circle_radius; speed_x = 0; }
+               if (Circle_y  - Circle_radius< 0) { Circle_y = 0 + Circle_radius; sensor_y = 0; }
+                if (Circle_y + Circle_radius > c.getHeight()) { Circle_y = c.getHeight() - Circle_radius; speed_y = 0; }
+            }
 
-            Circle_x += speed_x;
-            Circle_y += sensor_y;
-
-            if (Circle_x - Circle_radius < 0) { Circle_x = 0 + Circle_radius; speed_x = 0; }
-            if (Circle_x + Circle_radius > c.getWidth()) { Circle_x = c.getWidth() - Circle_radius; speed_x = 0; }
-            if (Circle_y  - Circle_radius< 0) { Circle_y = 0 + Circle_radius; sensor_y = 0; }
-            if (Circle_y + Circle_radius > c.getHeight()) { Circle_y = c.getHeight() - Circle_radius; speed_y = 0; }
             invalidate();
         }
 
@@ -169,10 +164,20 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     protected void DrawCircleAndText(Canvas c,int x, int y , int radius)
     {
+
         Paint p = new Paint();
         p.setColor(Color.GREEN);
 
-        c.drawCircle(x,y,radius, p);
+        if(FingerDownOnBall)
+        {
+            p.setColor(Color.RED);
+            c.drawCircle(x,y,75, p);
+        }
+        else
+        {
+            c.drawCircle(x,y,radius, p);
+        }
+
 
 
         p.setColor(Color.BLUE);

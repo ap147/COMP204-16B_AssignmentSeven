@@ -1,6 +1,7 @@
 package com.amarjot8.ballapp;
 
 import android.content.Context;
+import android.content.pm.ActivityInfo;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -18,6 +19,7 @@ import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.appindexing.Thing;
 import com.google.android.gms.common.api.GoogleApiClient;
+
 //http://stackoverflow.com/questions/26543268/android-making-an-app-fullscreen
 public class MainActivity extends AppCompatActivity implements SensorEventListener {
 
@@ -30,8 +32,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     final int rhieght = 100;
     //sensor's values will be sored
     float sx = 0, sy = 0, sz = 0;
-    int counter =0;
+    int counter = 0;
 
+    //Used to store Sesnor/ Register listner / Unregister listner
     SensorManager sMang;
     Sensor acc;
 
@@ -39,8 +42,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     public void onSensorChanged(SensorEvent event) {
         Sensor s = event.sensor;
         //checking sensor that triggered this method is Accelerometer
-        if(s.getType() == Sensor.TYPE_ACCELEROMETER)
-        {
+        if (s.getType() == Sensor.TYPE_ACCELEROMETER) {
             //Extracting information from sensor
             sx = event.values[0];
             sy = event.values[1];
@@ -51,6 +53,17 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
 
+    }
+
+
+    @Override
+    public void onStart() {
+        super.onStart();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
     }
 
     public class DrawingView extends View {
@@ -79,7 +92,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 dy = -dy;
 
             b.setTextSize(30);
-            c.drawText("Counter: "+counter,10,30,b);
+            c.drawText("Counter: " + counter, 10, 30, b);
             counter++;
             //Redraw when possible
             invalidate();
@@ -94,22 +107,26 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         acc = sMang.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 
         DrawingView dv = new DrawingView(this);
-        setContentView(dv);//R.layout.activity_main);
+        setContentView(dv);
         //Making the application Fullscreen
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
-    }
-    @Override
-    protected void onResume()
-    {
-        super.onResume();
-        sMang.registerListener(this,acc,SensorManager.SENSOR_DELAY_NORMAL);
+
+        //locked in portrait
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
     }
 
     @Override
-    protected void onPause()
-    {
+    protected void onResume() {
+        super.onResume();
+        //Registering Listener
+        sMang.registerListener(this, acc, SensorManager.SENSOR_DELAY_NORMAL);
+    }
+
+    @Override
+    protected void onPause() {
         super.onPause();
+        //Unregistering listner
         sMang.unregisterListener(this);
     }
 

@@ -108,12 +108,16 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 //User Puts finger down
                 case MotionEvent.ACTION_DOWN:
                     primary = new PointerPoint((int) event.getX(), (int) event.getY(), -1);
+                    pointers.add(new PointerPoint((int) event.getX(), (int) event.getY(), 0));
                     break;
                 //Moving finger across screen
                 case MotionEvent.ACTION_MOVE:
+                    pointers.get(0).x = (int) event.getX();
+                    pointers.get(0).y = (int) event.getY();
                     break;
                 //User lifts finger
                 case MotionEvent.ACTION_UP:
+                    pointers.clear();
                     primary = null;
                     break;
                 case MotionEvent.ACTION_POINTER_UP:
@@ -131,11 +135,13 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
             if(primary != null)
             {
+                Paint p = new Paint();
                 DrawCircleAndText(c, primary.x, primary.y, Circle_radius);
 
                 for(PointerPoint pp : pointers)
                 {
                     DrawCircleAndText(c, pp.x, pp.y,Circle_radius);
+                    c.drawLine(primary.x, primary.y, pp.x, pp.y, p);
                 }
             }
             invalidate();

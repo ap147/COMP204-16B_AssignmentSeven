@@ -21,6 +21,9 @@ import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.appindexing.Thing;
 import com.google.android.gms.common.api.GoogleApiClient;
 
+import java.util.ArrayList;
+import java.util.List;
+
 //http://stackoverflow.com/questions/26543268/android-making-an-app-fullscreen
 public class MainActivity extends AppCompatActivity implements SensorEventListener {
 
@@ -28,14 +31,15 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     //Circle Cords
     int Circle_x = 50; int Circle_y = 50;
-    //Circle Size
-    int Circle_radius = 50;
+
 
     //sensor's values will be sored
     float sensor_x = 0, sensor_y = 0, sensor_z = 0;
     //Speed
     int speed_x, speed_y = 0;
     int counter = 0;
+
+    boolean FingerDownOnBall = false;
 
     //Used to store Sesnor/ Register listner / Unregister listner
     SensorManager sMang;
@@ -52,7 +56,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             sensor_y = event.values[1];
             sensor_z = event.values[2];
 
-            System.out.println("sx : " + sensor_x + " sy : " + sensor_y + " sz : " + sensor_z );
+        //    System.out.println("sx : " + sensor_x + " sy : " + sensor_y + " sz : " + sensor_z );
         }
     }
 
@@ -84,7 +88,12 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             }
         }
 
+        //Circle Size
+        int Circle_radius = 50;
+
         public PointerPoint primary = null;
+        List<PointerPoint> pointers = new ArrayList<>();
+
         public DrawingView(Context c)
         {
             super(c);
@@ -104,8 +113,10 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 case MotionEvent.ACTION_MOVE:
                     break;
                 //User lifts finger
-                case MotionEvent.ACTION_POINTER_UP:
+                case MotionEvent.ACTION_UP:
                     primary = null;
+                    break;
+                case MotionEvent.ACTION_POINTER_UP:
                     break;
                 case  MotionEvent.ACTION_POINTER_DOWN:
                     break;
@@ -117,40 +128,43 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         @Override
         protected void onDraw(Canvas c)
         {
+
             if(primary != null)
             {
+                DrawCircleAndText(c, primary.x, primary.y, Circle_radius);
 
-                speed_x -= sensor_x;
-                speed_y += sensor_y;
-
-                Circle_x += speed_x;
-                Circle_y += speed_y;
-
-
-                if (Circle_x < 0) { Circle_x = 0 + Circle_radius; sensor_x = 0; }
-                if (Circle_x + Circle_radius  > c.getWidth()) { Circle_x = c.getWidth() - Circle_radius; speed_x = 0; }
-                if (Circle_y < 0) { Circle_y = 0 + Circle_radius; sensor_y = 0; }
-                if (Circle_y + Circle_radius > c.getHeight()) { Circle_y = c.getHeight() - Circle_radius; sensor_y = 0; }
-
-                DrawCircleAndText(c, Circle_x, Circle_y);
-           }
+                for(PointerPoint pp : pointers)
+                {
+                    DrawCircleAndText(c, pp.x, pp.y,Circle_radius);
+                }
+            }
             invalidate();
         }
 
     }
 
-    protected void DrawCircleAndText(Canvas c,int x, int y )
+    protected void DrawCircleAndText(Canvas c,int x, int y , int radius)
     {
         Paint p = new Paint();
         p.setColor(Color.GREEN);
 
-        c.drawCircle(x,y,Circle_radius, p);
+        c.drawCircle(x,y,radius, p);
 
 
         p.setColor(Color.BLUE);
         p.setTextSize(55);
         c.drawText("Counter :"+counter,10,100, p);
         counter++;
+    }
+
+    protected boolean IsFingerOnBall(int EventX, int EventY, int BallX, int BallY)
+    {
+        boolean result = false;
+
+
+        System.out.println(result);
+        //System.out.println("Ball X" + BallX + " Ball Y " +  BallY + " Event X " + EventX + " EventY " + EventY + "  RESULT " + result);
+        return result;
     }
 
     @Override

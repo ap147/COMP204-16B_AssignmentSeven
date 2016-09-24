@@ -73,8 +73,18 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     }
 
     public class DrawingView extends View {
-        boolean DrawCircle = false;
-        int x, y;
+        public class PointerPoint
+        {
+            public int x,y, index;
+            public PointerPoint(int x, int y, int index)
+            {
+                this.x = x;
+                this.y = y;
+                this.index = index;
+            }
+        }
+
+        public PointerPoint primary = null;
         public DrawingView(Context c)
         {
             super(c);
@@ -83,18 +93,21 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         @Override
         public boolean onTouchEvent(MotionEvent event)
         {
+            //Checking which type of touch was made
             switch(event.getActionMasked())
             {
+                //User Puts finger down
                 case MotionEvent.ACTION_DOWN:
-                    x = (int)event.getX();
-                    y = (int)event.getY();
-                    DrawCircle = true;
+                    primary = new PointerPoint((int) event.getX(), (int) event.getY(), -1);
                     break;
+                //Moving finger across screen
                 case MotionEvent.ACTION_MOVE:
-
                     break;
-                case MotionEvent.ACTION_UP:
-                    DrawCircle = false;
+                //User lifts finger
+                case MotionEvent.ACTION_POINTER_UP:
+                    primary = null;
+                    break;
+                case  MotionEvent.ACTION_POINTER_DOWN:
                     break;
             }
 
@@ -104,22 +117,23 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         @Override
         protected void onDraw(Canvas c)
         {
-            if(DrawCircle)
-            DrawCircleAndText(c,x,y);
+            if(primary != null)
+            DrawCircleAndText(c,primary.x,primary.y);
+            invalidate();
         }
 
     }
 
     protected void DrawCircleAndText(Canvas c,int x, int y )
     {
-        Paint p = new Paint(Color.RED);
-        p.setStrokeWidth(1);
-
+        Paint p = new Paint();
+        p.setColor(Color.GREEN);
+        p.setStrokeWidth(10);
         c.drawCircle(x,y,Circle_radius, p);
 
 
         p.setColor(Color.BLUE);
-        p.setTextSize(30);
+        p.setTextSize(55);
         c.drawText("Counter :"+counter,10,100, p);
         counter++;
     }

@@ -32,7 +32,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     //Circle Cords
     int Circle_x = 50; int Circle_y = 50;
 
-
     //sensor's values will be sored
     float sensor_x = 0, sensor_y = 0, sensor_z = 0;
     //Speed
@@ -107,18 +106,21 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             {
                 //User Puts finger down
                 case MotionEvent.ACTION_DOWN:
-                    primary = new PointerPoint((int) event.getX(), (int) event.getY(), -1);
+                    if(IsFingerOnBall((int) event.getX(),(int) event.getY()))
                     pointers.add(new PointerPoint((int) event.getX(), (int) event.getY(), 0));
                     break;
                 //Moving finger across screen
                 case MotionEvent.ACTION_MOVE:
-                    pointers.get(0).x = (int) event.getX();
-                    pointers.get(0).y = (int) event.getY();
+                    if(FingerDownOnBall)
+                    {
+                        pointers.get(0).x = (int) event.getX();
+                        pointers.get(0).y = (int) event.getY();
+                    }
                     break;
                 //User lifts finger
                 case MotionEvent.ACTION_UP:
-                    pointers.clear();
-                    primary = null;
+                  //  pointers.clear();
+                  //  primary = null;
                     break;
                 case MotionEvent.ACTION_POINTER_UP:
                     break;
@@ -133,17 +135,17 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         protected void onDraw(Canvas c)
         {
 
-            if(primary != null)
-            {
+           // if(primary != null)
+          //  {
                 Paint p = new Paint();
-                DrawCircleAndText(c, primary.x, primary.y, Circle_radius);
+                DrawCircleAndText(c, Circle_x, Circle_y, Circle_radius);
 
                 for(PointerPoint pp : pointers)
                 {
                     DrawCircleAndText(c, pp.x, pp.y,Circle_radius);
-                    c.drawLine(primary.x, primary.y, pp.x, pp.y, p);
+                    c.drawLine(Circle_x, Circle_y, pp.x, pp.y, p);
                 }
-            }
+          //  }
             invalidate();
         }
 
@@ -163,10 +165,18 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         counter++;
     }
 
-    protected boolean IsFingerOnBall(int EventX, int EventY, int BallX, int BallY)
+    protected boolean IsFingerOnBall(int EventX, int EventY)
     {
         boolean result = false;
 
+        if((EventX <= (Circle_x + 50) && (EventX > Circle_x - 50)) && (EventY <= (Circle_y + 50) && (EventY > Circle_y - 50)))
+        {
+            result =true;
+            FingerDownOnBall = true;
+        }
+        else{
+            FingerDownOnBall = false;
+        }
 
         System.out.println(result);
         //System.out.println("Ball X" + BallX + " Ball Y " +  BallY + " Event X " + EventX + " EventY " + EventY + "  RESULT " + result);

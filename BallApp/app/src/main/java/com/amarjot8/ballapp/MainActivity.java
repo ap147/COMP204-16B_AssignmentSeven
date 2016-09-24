@@ -24,14 +24,15 @@ import com.google.android.gms.common.api.GoogleApiClient;
 public class MainActivity extends AppCompatActivity implements SensorEventListener {
 
     //Rectangles cords
-    int rx, ry = 0;
-    //Speed
-    int dx = 10, dy = 10;
+    int Rectangle_x, Rectangle_y = 0;
+
     //Rectangles Size
     final int rwidth = 100;
     final int rhieght = 100;
     //sensor's values will be sored
-    float sx = 0, sy = 0, sz = 0;
+    float sensor_x = 0, sensor_y = 0, sensor_z = 0;
+    //Speed
+    int speed_x, speed_y = 0;
     int counter = 0;
 
     //Used to store Sesnor/ Register listner / Unregister listner
@@ -40,13 +41,16 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     @Override
     public void onSensorChanged(SensorEvent event) {
+
         Sensor s = event.sensor;
         //checking sensor that triggered this method is Accelerometer
         if (s.getType() == Sensor.TYPE_ACCELEROMETER) {
             //Extracting information from sensor
-            sx = event.values[0];
-            sy = event.values[1];
-            sz = event.values[2];
+            sensor_x = event.values[0];
+            sensor_y = event.values[1];
+            sensor_z = event.values[2];
+
+            System.out.println("sx : " + sensor_x + " sy : " + sensor_y + " sz : " + sensor_z );
         }
     }
 
@@ -77,19 +81,20 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             Paint b = new Paint();
             p.setColor(Color.RED);
             b.setColor(Color.BLUE);
-            c.drawRect(rx, ry, rx + rwidth, ry + rhieght, p);
-            rx += dx;
-            ry += dy;
+
+            c.drawRect(Rectangle_x, Rectangle_y, Rectangle_x + rwidth, Rectangle_y + rhieght, p);
+
+            speed_x = (int) sensor_x;
+            speed_y =(int) sensor_y;
+
+            Rectangle_x += speed_x;
+            Rectangle_y += speed_y;
 
             //When the ball hits the corner of the device, change direction
-            if (rx + rwidth > c.getWidth())
-                dx = -dx;
-            if (ry + rhieght > c.getHeight())
-                dy = -dy;
-            if (rx < 0)
-                dx = -dx;
-            if (ry < 0)
-                dy = -dy;
+            if (Rectangle_x < 0) { Rectangle_x = 0; speed_x = 0; }
+            if (Rectangle_x + rwidth > c.getWidth()) { Rectangle_x = c.getWidth() - rwidth; speed_x = 0; }
+            if (Rectangle_y < 0) { Rectangle_y = 0; speed_y = 0; }
+            if (Rectangle_y + rhieght > c.getHeight()) { Rectangle_y = c.getHeight() - rhieght; speed_y = 0; }
 
             b.setTextSize(30);
             c.drawText("Counter: " + counter, 10, 30, b);

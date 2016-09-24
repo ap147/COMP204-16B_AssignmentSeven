@@ -84,8 +84,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
             c.drawRect(Rectangle_x, Rectangle_y, Rectangle_x + rwidth, Rectangle_y + rhieght, p);
 
-            speed_x = (int) sensor_x;
-            speed_y =(int) sensor_y;
+            speed_x -= (int) sensor_x;
+            speed_y +=(int) sensor_y;
 
             Rectangle_x += speed_x;
             Rectangle_y += speed_y;

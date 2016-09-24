@@ -12,6 +12,7 @@ import android.hardware.SensorManager;
 import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 
@@ -23,12 +24,13 @@ import com.google.android.gms.common.api.GoogleApiClient;
 //http://stackoverflow.com/questions/26543268/android-making-an-app-fullscreen
 public class MainActivity extends AppCompatActivity implements SensorEventListener {
 
-    //Rectangles cords
-    int Rectangle_x, Rectangle_y = 0;
+    DrawingView dv;
 
-    //Rectangles Size
-    final int rwidth = 100;
-    final int rhieght = 100;
+    //Circle Cords
+    int Circle_x, Circle_y = 0;
+    //Circle Size
+    int Circle_radius = 50;
+
     //sensor's values will be sored
     float sensor_x = 0, sensor_y = 0, sensor_z = 0;
     //Speed
@@ -71,37 +73,55 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     }
 
     public class DrawingView extends View {
-        public DrawingView(Context c) {
+        boolean DrawCircle = false;
+        int x, y;
+        public DrawingView(Context c)
+        {
             super(c);
         }
 
         @Override
-        protected void onDraw(Canvas c) {
-            Paint p = new Paint();
-            Paint b = new Paint();
-            p.setColor(Color.RED);
-            b.setColor(Color.BLUE);
+        public boolean onTouchEvent(MotionEvent event)
+        {
+            switch(event.getActionMasked())
+            {
+                case MotionEvent.ACTION_DOWN:
+                    x = (int)event.getX();
+                    y = (int)event.getY();
+                    DrawCircle = true;
+                    break;
+                case MotionEvent.ACTION_MOVE:
 
-            c.drawRect(Rectangle_x, Rectangle_y, Rectangle_x + rwidth, Rectangle_y + rhieght, p);
+                    break;
+                case MotionEvent.ACTION_UP:
+                    DrawCircle = false;
+                    break;
+            }
 
-            speed_x -= (int) sensor_x;
-            speed_y +=(int) sensor_y;
-
-            Rectangle_x += speed_x;
-            Rectangle_y += speed_y;
-
-            //When the ball hits the corner of the device, change direction
-            if (Rectangle_x < 0) { Rectangle_x = 0; speed_x = 0; }
-            if (Rectangle_x + rwidth > c.getWidth()) { Rectangle_x = c.getWidth() - rwidth; speed_x = 0; }
-            if (Rectangle_y < 0) { Rectangle_y = 0; speed_y = 0; }
-            if (Rectangle_y + rhieght > c.getHeight()) { Rectangle_y = c.getHeight() - rhieght; speed_y = 0; }
-
-            b.setTextSize(30);
-            c.drawText("Counter: " + counter, 10, 30, b);
-            counter++;
-            //Redraw when possible
-            invalidate();
+            return true;
         }
+
+        @Override
+        protected void onDraw(Canvas c)
+        {
+            if(DrawCircle)
+            DrawCircleAndText(c,x,y);
+        }
+
+    }
+
+    protected void DrawCircleAndText(Canvas c,int x, int y )
+    {
+        Paint p = new Paint(Color.RED);
+        p.setStrokeWidth(1);
+
+        c.drawCircle(x,y,Circle_radius, p);
+
+
+        p.setColor(Color.BLUE);
+        p.setTextSize(30);
+        c.drawText("Counter :"+counter,10,100, p);
+        counter++;
     }
 
     @Override
